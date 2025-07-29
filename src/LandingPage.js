@@ -5,19 +5,19 @@ import styles from './Styles.module.css';
 
 // Fungsi simple untuk parsing token JWT dan mengembalikan payload JSON
 function parseJwt(token) {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  } catch (e) {
-    return null;
-  }
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+            atob(base64)
+                .split('')
+                .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                .join('')
+        );
+        return JSON.parse(jsonPayload);
+    } catch (e) {
+        return null;
+    }
 }
 
 const TechnoAcademyWebsite = () => {
@@ -28,19 +28,40 @@ const TechnoAcademyWebsite = () => {
     const [showedModal, setShowedModal] = useState(null); // 'product' | 'login' | null
     const [products, setProducts] = useState([]);
 
-  const [username, setUsername] = useState(null);
+    const [username, setUsername] = useState(null);
 
-  useEffect(() => {
-    // Ambil token dari cookies
-    const match = document.cookie.match(new RegExp('(^| )token=([^;]+)'));
-    if (match) {
-      const token = match[2];
-      const payload = parseJwt(token);
-      if (payload && payload.username) {
-        setUsername(payload.username);
-      }
-    }
-  }, []);
+    useEffect(() => {
+        // Ambil token dari cookies
+        const match = document.cookie.match(new RegExp('(^| )token=([^;]+)'));
+        if (match) {
+            const token = match[2];
+
+            fetch('https://bot.kediritechnopark.com/webhook/user-dev/data', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+
+                },
+            })
+                .then(res => res.json())
+                .then(data => {
+
+                    if (data && data[0] && data[0].token) {
+                        // Update token with data[0].token
+                        document.cookie = `token=${data[0].token}; path=/`;
+                    } else {
+                        console.warn('Token tidak ditemukan dalam data.');
+                    }
+                })
+                .catch(err => console.error('Fetch error:', err));
+
+            const payload = parseJwt(token);
+            if (payload && payload.username) {
+                setUsername(payload.username);
+            }
+        }
+    }, []);
 
     const features = [
         {
@@ -79,35 +100,35 @@ const TechnoAcademyWebsite = () => {
     return (
         <div style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
             {/* Header */}
-            
-    <header className={styles.header}>
-      <img src="./kediri-technopark-logo.png" className={styles.logo} alt="Logo" />
 
-      <nav className={styles.nav}>
-        {['HOME', 'COURSES', 'USER'].map((item, index) => (
-          <a
-            key={item}
-            className={`${styles.navLink} ${hoveredNav === index ? styles.navLinkHover : ''}`}
-            onMouseEnter={() => setHoveredNav(index)}
-            onMouseLeave={() => setHoveredNav(null)}
-          >
-            {item}
-          </a>
-        ))}
-      </nav>
+            <header className={styles.header}>
+                <img src="./kediri-technopark-logo.png" className={styles.logo} alt="Logo" />
 
-      <div className={styles.authButtons}>
-        {username ? (
-          <span style={{ color: '#2563eb', fontWeight: '600' }}>
-            Halo, {username}
-          </span>
-        ) : (
-          <button className={styles.loginButton} onClick={() => setShowedModal('login')}>
-            LOGIN
-          </button>
-        )}
-      </div>
-    </header>
+                <nav className={styles.nav}>
+                    {['HOME', 'COURSES', 'USER'].map((item, index) => (
+                        <a
+                            key={item}
+                            className={`${styles.navLink} ${hoveredNav === index ? styles.navLinkHover : ''}`}
+                            onMouseEnter={() => setHoveredNav(index)}
+                            onMouseLeave={() => setHoveredNav(null)}
+                        >
+                            {item}
+                        </a>
+                    ))}
+                </nav>
+
+                <div className={styles.authButtons}>
+                    {username ? (
+                        <span style={{ color: '#2563eb', fontWeight: '600' }}>
+                            Halo, {username}
+                        </span>
+                    ) : (
+                        <button className={styles.loginButton} onClick={() => setShowedModal('login')}>
+                            LOGIN
+                        </button>
+                    )}
+                </div>
+            </header>
 
             {/* Hero Section */}
             <section className={styles.hero}>
@@ -250,8 +271,8 @@ const TechnoAcademyWebsite = () => {
                     >
                         {showedModal === 'product' && (
                             <ProductDetailPage
-                            setPostLoginAction={setPostLoginAction} 
-                            setShowedModal={setShowedModal}
+                                setPostLoginAction={setPostLoginAction}
+                                setShowedModal={setShowedModal}
                                 product={selectedProduct}
                                 onClose={() => {
                                     setShowedModal(null);
