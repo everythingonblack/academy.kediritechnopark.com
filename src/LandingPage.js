@@ -21,6 +21,7 @@ function parseJwt(token) {
 }
 
 const TechnoAcademyWebsite = () => {
+    const [postLoginAction, setPostLoginAction] = useState(null);
     const [selectedProduct, setSelectedProduct] = useState({});
     const [hoveredCard, setHoveredCard] = useState(null);
     const [hoveredNav, setHoveredNav] = useState(null);
@@ -249,6 +250,8 @@ const TechnoAcademyWebsite = () => {
                     >
                         {showedModal === 'product' && (
                             <ProductDetailPage
+                            setPostLoginAction={setPostLoginAction} 
+                            setShowedModal={setShowedModal}
                                 product={selectedProduct}
                                 onClose={() => {
                                     setShowedModal(null);
@@ -257,7 +260,7 @@ const TechnoAcademyWebsite = () => {
                             />
                         )}
                         {showedModal === 'login' && (
-                            <Login onClose={() => setShowedModal(null)} />
+                            <Login postLoginAction={postLoginAction} setPostLoginAction={setPostLoginAction} onClose={() => setShowedModal(null)} />
                         )}
                     </div>
                 </div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from './ProductDetail.module.css';
 
-const ProductDetail = ({ product, onClose }) => {
+const ProductDetail = ({ product, setPostLoginAction, setShowedModal }) => {
   const [inCart, setInCart] = useState(false);
 
   useEffect(() => {
@@ -47,42 +47,47 @@ const ProductDetail = ({ product, onClose }) => {
       setInCart(true);
     }
 
-    document.cookie = `itemsId=${JSON.stringify(updatedItems)}; path=/; max-age=${
-      7 * 24 * 60 * 60
-    }`;
+    document.cookie = `itemsId=${JSON.stringify(updatedItems)}; path=/; max-age=${7 * 24 * 60 * 60
+      }`;
   };
 
   const onCheckout = () => {
-  // Ambil token dari cookie
-  const tokenCookie = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('token='));
-  const token = tokenCookie ? tokenCookie.split('=')[1] : '';
+    // Ambil token dari cookie
+    const tokenCookie = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='));
+    const token = tokenCookie ? tokenCookie.split('=')[1] : '';
 
-  // Ambil itemsId dari cookie
-  const itemsCookie = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('itemsId='));
+    // Ambil itemsId dari cookie
+    const itemsCookie = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('itemsId='));
 
-  let items = [];
-  if (itemsCookie) {
-    try {
-      items = JSON.parse(itemsCookie.split('=')[1]);
-      if (!Array.isArray(items)) items = [];
-    } catch (e) {
-      items = [];
+    let items = [];
+    if (itemsCookie) {
+      try {
+        items = JSON.parse(itemsCookie.split('=')[1]);
+        if (!Array.isArray(items)) items = [];
+      } catch (e) {
+        items = [];
+      }
     }
-  }
-  
-if (!items.includes(product.id)) {
-  items.push(product.id);
-}
-  // Encode items ke string untuk query param
-  const itemsParam = JSON.stringify(items);
 
-  // Redirect dengan token dan itemsId di query
-  window.location.href = `http://localhost:3001/?token=${token}&itemsId=${itemsParam}`;
-};
+    if (!items.includes(product.id)) {
+      items.push(product.id);
+    }
+    // Encode items ke string untuk query param
+    const itemsParam = JSON.stringify(items);
+
+    if (!tokenCookie) {
+      setPostLoginAction(() => () => onCheckout()); // remember intent
+      setShowedModal('login');
+      return;
+    }
+
+    // Redirect dengan token dan itemsId di query
+    window.location.href = `http://localhost:3001/?token=${token}&itemsId=${itemsParam}&redirect_uri=http://localhost:3000/course&redirect_failed=http://localhost:3000`;
+  };
 
 
   // Override harga warna jika free
@@ -91,7 +96,7 @@ if (!items.includes(product.id)) {
   return (
     <div className={styles.container}>
       <div className={styles.image}>📦</div>
-      
+
       <div className={styles.headerRow}>
         <h2 className={styles.title}>{product.name}</h2>
         <div className={styles.price} style={{ color: priceColor }}>
@@ -100,9 +105,9 @@ if (!items.includes(product.id)) {
             : `Rp ${parseInt(product.price).toLocaleString('id-ID')}`}
         </div>
       </div>
-      
+
       <p className={styles.description}>{product.description}</p>
-      
+
       <div className={styles.buttonGroup}>
         <button
           className={`${styles.button} ${styles.addToCartButton}`}
