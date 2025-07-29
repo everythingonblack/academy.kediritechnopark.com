@@ -1,11 +1,18 @@
-import logo from './logo.svg';
 import './App.css';
-import LandingPage from './LandingPage'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import LandingPage from './LandingPage';
+import CoursePage from './CoursePage';
+
 function App() {
   return (
-    <div className="App">
-      <LandingPage/>
-    </div>
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/courses" element={<CoursePage />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

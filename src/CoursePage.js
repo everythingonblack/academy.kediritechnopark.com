@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import ProductDetailPage from './ProductDetailPage';
 import Login from './Login';
 import styles from './Styles.module.css';
@@ -21,8 +20,7 @@ function parseJwt(token) {
     }
 }
 
-const TechnoAcademyWebsite = () => {
-    const navigate = useNavigate();
+const CoursePage = () => {
     const [postLoginAction, setPostLoginAction] = useState(null);
     const [selectedProduct, setSelectedProduct] = useState({});
     const [hoveredCard, setHoveredCard] = useState(null);
@@ -62,6 +60,19 @@ const TechnoAcademyWebsite = () => {
             if (payload && payload.username) {
                 setUsername(payload.username);
             }
+
+
+        fetch('https://bot.kediritechnopark.com/webhook/users-dev/my-products', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ type: 'course' }),
+        })
+            .then(res => res.json())
+            .then(data => setProducts(data))
+            .catch(err => console.error('Fetch error:', err));
         }
     }, []);
 
@@ -86,19 +97,6 @@ const TechnoAcademyWebsite = () => {
         },
     ];
 
-    useEffect(() => {
-        fetch('https://bot.kediritechnopark.com/webhook/store-dev/products', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ type: 'course' }),
-        })
-            .then(res => res.json())
-            .then(data => setProducts(data))
-            .catch(err => console.error('Fetch error:', err));
-    }, []);
-
     return (
         <div style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
             {/* Header */}
@@ -113,13 +111,6 @@ const TechnoAcademyWebsite = () => {
                             className={`${styles.navLink} ${hoveredNav === index ? styles.navLinkHover : ''}`}
                             onMouseEnter={() => setHoveredNav(index)}
                             onMouseLeave={() => setHoveredNav(null)}
-                            onClick={() => {
-                                if (item === 'HOME') {
-                                    navigate('/');
-                                } else if (item === 'COURSES') {
-                                    navigate('/courses');
-                                }
-                            }}
                         >
                             {item}
                         </a>
@@ -299,4 +290,4 @@ const TechnoAcademyWebsite = () => {
     );
 };
 
-export default TechnoAcademyWebsite;
+export default CoursePage;
