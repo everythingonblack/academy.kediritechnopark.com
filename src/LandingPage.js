@@ -193,7 +193,7 @@ const TechnoAcademyWebsite = () => {
                                     onMouseEnter={() => setHoveredCard(product.id)}
                                     onMouseLeave={() => setHoveredCard(null)}
                                 >
-                                    <div className={styles.courseImage}>
+                                    <div className={styles.courseImage} style={{ backgroundImage: `url(${product.image})` }}>
                                         {product.price === 0 && (
                                             <span className={styles.courseLabel}>Free</span>
                                         )}

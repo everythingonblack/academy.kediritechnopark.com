@@ -223,6 +223,10 @@
     align-items: center;
     justify-content: center;
     color: #64748b;
+    
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
 }
 
 .courseLabel {
