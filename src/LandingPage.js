@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProductDetailPage from './ProductDetailPage';
 import Login from './Login';
@@ -32,6 +32,11 @@ const TechnoAcademyWebsite = () => {
 
     const [username, setUsername] = useState(null);
 
+  const courseSectionRef = useRef(null);
+
+  const scrollToCourse = () => {
+    courseSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
     useEffect(() => {
         // Ambil token dari cookies
         const match = document.cookie.match(new RegExp('(^| )token=([^;]+)'));
@@ -107,23 +112,38 @@ const TechnoAcademyWebsite = () => {
                 <img src="./kediri-technopark-logo.png" className={styles.logo} alt="Logo" />
 
                 <nav className={styles.nav}>
-                    {['HOME', 'COURSES', 'USER'].map((item, index) => (
-                        <a
-                            key={item}
-                            className={`${styles.navLink} ${hoveredNav === index ? styles.navLinkHover : ''}`}
-                            onMouseEnter={() => setHoveredNav(index)}
+                    <a
+                            className={`${styles.navLink} ${hoveredNav === 1 ? styles.navLinkHover : ''}`}
+                            onMouseEnter={() => setHoveredNav(1)}
                             onMouseLeave={() => setHoveredNav(null)}
                             onClick={() => {
-                                if (item === 'HOME') {
-                                    navigate('/');
-                                } else if (item === 'COURSES') {
+                                navigate('/');
+                                
+                            }}
+                        >
+                            HOME
+                        </a><a
+                            className={`${styles.navLink} ${hoveredNav === 3 ? styles.navLinkHover : ''}`}
+                            onMouseEnter={() => setHoveredNav(2)}
+                            onMouseLeave={() => setHoveredNav(null)}
+                            onClick={() => {
+                                if (username == null) {
+                                    scrollToCourse();
+                                }
+                                else {
                                     navigate('/courses');
                                 }
                             }}
                         >
-                            {item}
+                            COURSES
                         </a>
-                    ))}
+                        <a
+                            className={`${styles.navLink} ${hoveredNav === 3 ? styles.navLinkHover : ''}`}
+                            onMouseEnter={() => setHoveredNav(3)}
+                            onMouseLeave={() => setHoveredNav(null)}
+                        >
+                            USER
+                        </a>
                 </nav>
 
                 <div className={styles.authButtons}>
@@ -157,8 +177,8 @@ const TechnoAcademyWebsite = () => {
 
             {/* Courses Section */}
             <section className={styles.Section}>
-                <div className={styles.coursesContainer}>
-                    <h2 className={styles.coursesTitle}>OUR COURSES</h2>
+                <div  className={styles.coursesContainer}>
+                    <h2 ref={courseSectionRef} className={styles.coursesTitle}>OUR COURSES</h2>
                     <div className={styles.coursesGrid}>
                         {products &&
                             products[0]?.name &&
