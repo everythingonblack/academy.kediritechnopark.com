@@ -24,11 +24,8 @@ const CoursePage = () => {
     const [postLoginAction, setPostLoginAction] = useState(null);
     const [selectedProduct, setSelectedProduct] = useState({});
     const [hoveredCard, setHoveredCard] = useState(null);
-    const [hoveredNav, setHoveredNav] = useState(null);
     const [showedModal, setShowedModal] = useState(null); // 'product' | 'login' | null
     const [products, setProducts] = useState([]);
-
-    const [username, setUsername] = useState(null);
 
     useEffect(() => {
         // Ambil token dari cookies
@@ -36,37 +33,11 @@ const CoursePage = () => {
         if (match) {
             const token = match[2];
 
-            fetch('https://bot.kediritechnopark.com/webhook/user-dev/data', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-
-                },
-            })
-                .then(res => res.json())
-                .then(data => {
-
-                    if (data && data[0] && data[0].token) {
-                        // Update token with data[0].token
-                        document.cookie = `token=${data[0].token}; path=/`;
-                    } else {
-                        console.warn('Token tidak ditemukan dalam data.');
-                    }
-                })
-                .catch(err => console.error('Fetch error:', err));
-
-            const payload = parseJwt(token);
-            if (payload && payload.username) {
-                setUsername(payload.username);
-            }
-
-
         fetch('https://bot.kediritechnopark.com/webhook/users-dev/my-products', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
+                'Authorization': 'Bearer ' + token
             },
             body: JSON.stringify({ type: 'course' }),
         })
@@ -99,53 +70,7 @@ const CoursePage = () => {
 
     return (
         <div style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-            {/* Header */}
-
-            <header className={styles.header}>
-                <img src="./kediri-technopark-logo.png" className={styles.logo} alt="Logo" />
-
-                <nav className={styles.nav}>
-                    {['HOME', 'COURSES', 'USER'].map((item, index) => (
-                        <a
-                            key={item}
-                            className={`${styles.navLink} ${hoveredNav === index ? styles.navLinkHover : ''}`}
-                            onMouseEnter={() => setHoveredNav(index)}
-                            onMouseLeave={() => setHoveredNav(null)}
-                        >
-                            {item}
-                        </a>
-                    ))}
-                </nav>
-
-                <div className={styles.authButtons}>
-                    {username ? (
-                        <span style={{ color: '#2563eb', fontWeight: '600' }}>
-                            Halo, {username}
-                        </span>
-                    ) : (
-                        <button className={styles.loginButton} onClick={() => setShowedModal('login')}>
-                            LOGIN
-                        </button>
-                    )}
-                </div>
-            </header>
-
-            {/* Hero Section */}
-            <section className={styles.hero}>
-                <div className={styles.heroContainer}>
-                    <div className={styles.heroContent}>
-                        <h1 className={styles.heroTitle}>
-                            Unlock The Infinite <span style={{ color: '#fbbf24' }}>Possibility</span>
-                        </h1>
-                        <p className={styles.heroDescription}>
-                            Akademi Kediri Techno Park hadir untuk menjembatani dunia belajar dan dunia kerja.
-                            Dengan pendekatan praktis dan kurikulum berbasis industri, kami bantu kamu siap talenta siap pakai.
-                        </p>
-                        <button className={styles.joinButton}>JOIN FOR FREE</button>
-                    </div>
-                </div>
-            </section>
-
+         
             {/* Courses Section */}
             <section className={styles.Section}>
                 <div className={styles.coursesContainer}>

@@ -1,74 +1,17 @@
-import React, { useState, useEffect,useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ProductDetailPage from './ProductDetailPage';
-import Login from './Login';
 import styles from './Styles.module.css';
 
-// Fungsi simple untuk parsing token JWT dan mengembalikan payload JSON
-function parseJwt(token) {
-    try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(
-            atob(base64)
-                .split('')
-                .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-                .join('')
-        );
-        return JSON.parse(jsonPayload);
-    } catch (e) {
-        return null;
-    }
-}
 
-const TechnoAcademyWebsite = () => {
+
+const TechnoAcademyWebsite = ({ setShowedModal, setSelectedProduct }) => {
     const navigate = useNavigate();
-    const [postLoginAction, setPostLoginAction] = useState(null);
-    const [selectedProduct, setSelectedProduct] = useState({});
     const [hoveredCard, setHoveredCard] = useState(null);
-    const [hoveredNav, setHoveredNav] = useState(null);
-    const [showedModal, setShowedModal] = useState(null); // 'product' | 'login' | null
+
     const [products, setProducts] = useState([]);
 
-    const [username, setUsername] = useState(null);
 
-  const courseSectionRef = useRef(null);
-
-  const scrollToCourse = () => {
-    courseSectionRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-    useEffect(() => {
-        // Ambil token dari cookies
-        const match = document.cookie.match(new RegExp('(^| )token=([^;]+)'));
-        if (match) {
-            const token = match[2];
-
-            fetch('https://bot.kediritechnopark.com/webhook/user-dev/data', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-
-                },
-            })
-                .then(res => res.json())
-                .then(data => {
-
-                    if (data && data[0] && data[0].token) {
-                        // Update token with data[0].token
-                        document.cookie = `token=${data[0].token}; path=/`;
-                    } else {
-                        console.warn('Token tidak ditemukan dalam data.');
-                    }
-                })
-                .catch(err => console.error('Fetch error:', err));
-
-            const payload = parseJwt(token);
-            if (payload && payload.username) {
-                setUsername(payload.username);
-            }
-        }
-    }, []);
+    const courseSectionRef = useRef(null);
 
     const features = [
         {
@@ -106,59 +49,6 @@ const TechnoAcademyWebsite = () => {
 
     return (
         <div style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-            {/* Header */}
-
-            <header className={styles.header}>
-                <img src="./kediri-technopark-logo.png" className={styles.logo} alt="Logo" />
-
-                <nav className={styles.nav}>
-                    <a
-                            className={`${styles.navLink} ${hoveredNav === 1 ? styles.navLinkHover : ''}`}
-                            onMouseEnter={() => setHoveredNav(1)}
-                            onMouseLeave={() => setHoveredNav(null)}
-                            onClick={() => {
-                                navigate('/');
-                                
-                            }}
-                        >
-                            HOME
-                        </a><a
-                            className={`${styles.navLink} ${hoveredNav === 3 ? styles.navLinkHover : ''}`}
-                            onMouseEnter={() => setHoveredNav(2)}
-                            onMouseLeave={() => setHoveredNav(null)}
-                            onClick={() => {
-                                if (username == null) {
-                                    scrollToCourse();
-                                }
-                                else {
-                                    navigate('/courses');
-                                }
-                            }}
-                        >
-                            COURSES
-                        </a>
-                        <a
-                            className={`${styles.navLink} ${hoveredNav === 3 ? styles.navLinkHover : ''}`}
-                            onMouseEnter={() => setHoveredNav(3)}
-                            onMouseLeave={() => setHoveredNav(null)}
-                        >
-                            USER
-                        </a>
-                </nav>
-
-                <div className={styles.authButtons}>
-                    {username ? (
-                        <span style={{ color: '#2563eb', fontWeight: '600' }}>
-                            Halo, {username}
-                        </span>
-                    ) : (
-                        <button className={styles.loginButton} onClick={() => setShowedModal('login')}>
-                            LOGIN
-                        </button>
-                    )}
-                </div>
-            </header>
-
             {/* Hero Section */}
             <section className={styles.hero}>
                 <div className={styles.heroContainer}>
@@ -177,7 +67,7 @@ const TechnoAcademyWebsite = () => {
 
             {/* Courses Section */}
             <section className={styles.Section}>
-                <div  className={styles.coursesContainer}>
+                <div className={styles.coursesContainer}>
                     <h2 ref={courseSectionRef} className={styles.coursesTitle}>OUR COURSES</h2>
                     <div className={styles.coursesGrid}>
                         {products &&
@@ -284,37 +174,6 @@ const TechnoAcademyWebsite = () => {
                     </div>
                 </div>
             </footer>
-
-            {/* Unified Modal */}
-            {showedModal && (
-                <div
-                    className={styles.modal}
-                    onClick={() => {
-                        setShowedModal(null);
-                        setSelectedProduct({});
-                    }}
-                >
-                    <div
-                        className={styles.modalBody}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        {showedModal === 'product' && (
-                            <ProductDetailPage
-                                setPostLoginAction={setPostLoginAction}
-                                setShowedModal={setShowedModal}
-                                product={selectedProduct}
-                                onClose={() => {
-                                    setShowedModal(null);
-                                    setSelectedProduct({});
-                                }}
-                            />
-                        )}
-                        {showedModal === 'login' && (
-                            <Login postLoginAction={postLoginAction} setPostLoginAction={setPostLoginAction} onClose={() => setShowedModal(null)} />
-                        )}
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

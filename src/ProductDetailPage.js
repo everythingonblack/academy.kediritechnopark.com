@@ -86,7 +86,7 @@ const ProductDetail = ({ product, setPostLoginAction, setShowedModal }) => {
     }
 
     // Redirect dengan token dan itemsId di query
-    window.location.href = `http://localhost:3001/?token=${token}&itemsId=${itemsParam}&redirect_uri=http://localhost:3000/courses&redirect_failed=http://localhost:3000`;
+    window.location.href = `http://localhost:3002/?token=${token}&itemsId=${itemsParam}&redirect_uri=http://localhost:3000/courses&redirect_failed=http://localhost:3000`;
   };
 
 
