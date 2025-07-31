@@ -85,7 +85,7 @@ const ProductDetail = ({ product, setPostLoginAction, setShowedModal }) => {
       return;
     }
 
-    // Redirect dengan token dan itemsId di query
+    // Redirect dengan token dan itemsId di query route ke checkout.kediritechnopark.com
     window.location.href = `http://localhost:3002/?token=${token}&itemsId=${itemsParam}&redirect_uri=http://localhost:3000/courses&redirect_failed=http://localhost:3000`;
   };
 
